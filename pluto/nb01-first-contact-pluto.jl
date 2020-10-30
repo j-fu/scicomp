@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.12.4
+# v0.12.6
 
 using Markdown
 using InteractiveUtils
@@ -13,7 +13,7 @@ macro bind(def, element)
     end
 end
 
-# ╔═╡ 46a14436-14b0-11eb-0278-c9a47fcc651f
+# ╔═╡ 41b70dc6-1b01-11eb-138e-9db71f12f98b
 using PlutoUI
 
 # ╔═╡ 01a6905c-f433-11ea-3b49-2fd602014456
@@ -188,7 +188,11 @@ Normally text output from statements in a cell is shown in the console window wh
 """
 
 # ╔═╡ c0e32bd4-fc59-11ea-1538-e928da52b4df
-import Pkg; Pkg.activate(mktempdir()); Pkg.add("PlutoUI")
+begin
+	import Pkg
+	Pkg.activate(mktempdir())
+	Pkg.add("PlutoUI")
+end
 
 # ╔═╡ ea5322e4-fc59-11ea-036a-073625d78246
 with_terminal() do
@@ -226,13 +230,13 @@ The live docs pane in the lower right bottom allows to quickly obtain help infor
 # ╠═1847c644-0a3a-11eb-1480-192677ceafe4
 # ╠═251d1036-0a3a-11eb-1db0-9fd46b886027
 # ╟─d147bd98-f434-11ea-24ea-4d7d74ea4ad6
-# ╠═cdfce4ae-f434-11ea-3919-67326f3cd259
+# ╟─cdfce4ae-f434-11ea-3919-67326f3cd259
 # ╠═b3a9aad0-f435-11ea-39cf-e3a514257dab
 # ╟─5d600b34-09bc-11eb-0d22-b5916513b971
 # ╟─9dcd57b0-f438-11ea-32b3-093908389ac1
 # ╠═10fc80ac-f43a-11ea-3234-0f301d8b05c0
 # ╟─43493d8a-fc59-11ea-00d5-d188ed8a56b3
 # ╠═c0e32bd4-fc59-11ea-1538-e928da52b4df
-# ╠═46a14436-14b0-11eb-0278-c9a47fcc651f
+# ╠═41b70dc6-1b01-11eb-138e-9db71f12f98b
 # ╠═ea5322e4-fc59-11ea-036a-073625d78246
 # ╟─0b867b9e-09bd-11eb-2785-13dd948f53e8

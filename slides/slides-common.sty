@@ -1,0 +1,35 @@
+\usetheme{Frankfurt}
+
+\renewcommand{\subsection}[1]{~\newline~\vfill\begin{center}{\large\textbf{#1}}\end{center}\vfill~\newline~}
+\renewcommand{\section}[1]{~\newline~\vfill\begin{center}{\LARGE\textbf{#1}}\end{center}\vfill~\newline~}
+
+\setbeamertemplate{navigation symbols}{\hspace{1em}\usebeamerfont{footline} Lecture \@mylecture Slide \insertframenumber}
+
+\newcommand{\oldslide}[2]{
+{
+  \setbeamercolor{background canvas}{bg=}
+  \refstepcounter{framenumber}
+  \includepdf[pages={#2}, frame=true,noautoscale,scale=0.93]{#1}
+}
+}
+
+
+
+\newcommand{\titleframe}{
+\begin{frame}
+
+  \vfill 
+
+  Scientific Computing WS 2020/2021
+  \bigskip 
+
+  Lecture \themylecture
+
+  \bigskip
+  Jürgen Fuhrmann
+
+  juergen.fuhrmann@wias-berlin.de
+
+  \vfill~  
+\end{frame}
+}

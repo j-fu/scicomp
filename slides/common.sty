@@ -1,0 +1,184 @@
+\usepackage[colorlinks]{hyperref}
+\usepackage{tikz}
+\usepackage{pdfpages}
+\usepackage{framed}
+\usepackage{fancyvrb}
+%\usepackage{listings}
+\usepackage{verbatim}
+
+\usepackage{minted}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath,amscd}
+\usepackage{longtable}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{fixltx2e}
+\usepackage[utf8]{inputenc}
+\usepackage{microtype}
+\usepackage{marvosym}
+\usepackage{parskip}
+\usepackage{etoolbox}
+\usepackage{algorithm2e}
+\usetikzlibrary{tikzmark,chains}
+\usepackage{tkz-euclide}
+\usetikzlibrary{arrows,%
+                petri,%
+                topaths,calc,
+                automata,shapes.geometric,positioning}%
+
+
+\usepackage{pgffor}
+
+\graphicspath{ {./pic/}}
+\UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+\setlength{\emergencystretch}{3em}  % prevent overfull lines
+\providecommand{\tightlist}{\setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{0}
+
+
+\definecolor{mintedbg}{rgb}{0.85,0.85,0.85}
+\newminted{text}{fontsize=\footnotesize,bgcolor=mintedbg,style=bw, autogobble}
+\newminted{c}{fontsize=\footnotesize,bgcolor=mintedbg,style=bw, autogobble}
+\newminted{cpp}{fontsize=\footnotesize,bgcolor=mintedbg,style=bw, autogobble}
+\newminted{python}{fontsize=\footnotesize,bgcolor=mintedbg,style=bw, autogobble}
+\newminted{julia}{fontsize=\footnotesize,bgcolor=mintedbg,style=bw, autogobble}
+\newminted{bash}{fontsize=\footnotesize,bgcolor=mintedbg,style=bw, autogobble}
+\newminted{cmake}{fontsize=\footnotesize,bgcolor=mintedbg,style=bw, autogobble}
+
+
+\AtBeginEnvironment{minted}{\let\itshape\relax}
+
+
+\newcommand{\bb}[1]{\mathbb #1}
+\newcommand{\ca}[1]{\mathcal #1}
+\newcommand{\RR}{\bb{R}}
+\newcommand{\DD}{\bb{D}}
+\newcommand{\QQ}{\bb{Q}}
+\newcommand{\ZZ}{\bb{Z}}
+\newcommand{\NN}{\bb{N}}
+\newcommand{\PP}{\bb{P}}
+\newcommand{\VV}{\bb{V}}
+\newcommand{\CC}{\bb{C}}
+\newcommand{\CK}{\ca{K}}
+\newcommand{\CN}{\ca{N}}
+\newcommand{\CG}{\ca{G}}
+\newcommand{\CT}{\ca{T}}
+\newcommand{\CI}{\ca{I}}
+
+\newcommand{\vvec}[1]{\vec{#1}}
+\newcommand{\vx}{\vvec{x}}
+\newcommand{\vy}{\vvec{y}}
+\newcommand{\vz}{\vvec{z}}
+\newcommand{\vu}{\vvec{u}}
+\newcommand{\vv}{\vvec{v}}
+\newcommand{\vj}{\vvec{j}}
+\newcommand{\vp}{\vvec{p}}
+\newcommand{\vq}{\vvec{q}}
+\newcommand{\va}{\vvec{a}}
+\newcommand{\ve}{\vvec{e}}
+\newcommand{\vb}{\vvec{b}}
+\newcommand{\vc}{\vvec{c}}
+\newcommand{\vd}{\vvec{d}}
+\newcommand{\vn}{\vvec{n}}
+\newcommand{\vnu}{\vvec{\nu}}
+\newcommand{\vnabla}{\vvec{\nabla}}
+\newcommand{\vlambda}{\vvec{\lambda}}
+\newcommand{\vsigma}{\vvec{\sigma}}
+
+\newcommand{\grad}{\vnabla}
+\renewcommand{\div}{\nabla\cdot}
+
+
+\newcommand{\norm}[1]{\lVert#1\rVert}
+\newcommand{\normli}[1]{\lVert#1\rVert_{L^1}}
+\newcommand{\normlii}[1]{\lVert#1\rVert_{L^2}}
+\DeclareMathOperator{\tr}{tr}
+\DeclareMathOperator{\sspan}{span}
+\DeclareMathOperator{\supp}{supp}
+\DeclareMathOperator{\card}{card}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% see https://tex.stackexchange.com/questions/46711/reusing-slides-from-beamer-presentations
+
+\newcommand{\DefineSection}[2]{\setbeamertemplate{slide #1}{{#2}}}
+
+\newcommand{\UseSection}[1]{
+  \ifbeamertemplateempty{slide #1}%
+  {
+    \errmessage empty section: {#1}
+  }%
+  {
+    % \opt{texdebug}{\message{        *** Using section: (#1) }}
+    \usebeamertemplate{slide #1}%
+  }%
+}
+
+\newif\iflectureI\lectureIfalse
+\newif\iflectureII\lectureIIfalse
+\newif\iflectureIII\lectureIIIfalse
+\newif\iflectureIV\lectureIVfalse
+\newif\iflectureV\lectureVfalse
+\newif\iflectureVI\lectureVIfalse
+\newif\iflectureVII\lectureVIIfalse
+\newif\iflectureVIII\lectureVIIIfalse
+\newif\iflectureIX\lectureIXfalse
+\newif\iflectureX\lectureXfalse
+\newif\iflectureXI\lectureXIfalse
+\newif\iflectureXII\lectureXIIfalse
+\newif\iflectureXIII\lectureXIIIfalse
+\newif\iflectureXIV\lectureXIVfalse
+\newif\iflectureXV\lectureXVfalse
+\newif\iflectureXVI\lectureXVIfalse
+\newif\iflectureXVII\lectureXVIIfalse
+\newif\iflectureXVIII\lectureXVIIIfalse
+\newif\iflectureXIX\lectureXIXfalse
+\newif\iflectureXX\lectureXXfalse
+\newif\iflectureXXI\lectureXXIfalse
+\newif\iflectureXXII\lectureXXIIfalse
+\newif\iflectureXXIII\lectureXXIIIfalse
+\newif\iflectureXXIV\lectureXXIVfalse
+\newif\iflectureXXV\lectureXXVfalse
+\newif\iflectureXXVI\lectureXXVIfalse
+\newif\iflectureXXVII\lectureXXVIIfalse
+\newif\iflectureXXVIII\lectureXXVIIIfalse
+\newif\iflectureXXIX\lectureXXIXfalse
+
+\def\@mylecture{0}
+\providecommand{\iflecture}[1]{\ifnumequal{\@mylecture}{#1}}
+\newcommand{\mylecture}[1]{%
+\def\@mylecture{#1}
+\iflecture{1}\lectureItrue{}%
+\iflecture{2}\lectureIItrue{}%
+\iflecture{3}\lectureIIItrue{}%
+\iflecture{4}\lectureIVtrue{}%
+\iflecture{5}\lectureVtrue{}%
+\iflecture{6}\lectureVItrue{}%
+\iflecture{7}\lectureVIItrue{}%
+\iflecture{8}\lectureVIIItrue{}%
+\iflecture{9}\lectureIXtrue{}%
+\iflecture{10}\lectureXtrue{}%
+\iflecture{11}\lectureXItrue{}%
+\iflecture{12}\lectureXIItrue{}%
+\iflecture{13}\lectureXIIItrue{}%
+\iflecture{14}\lectureXIVtrue{}%
+\iflecture{15}\lectureXVtrue{}%
+\iflecture{16}\lectureXVItrue{}%
+\iflecture{17}\lectureXVIItrue{}%
+\iflecture{18}\lectureXVIIItrue{}%
+\iflecture{19}\lectureXIXtrue{}%
+\iflecture{20}\lectureXXtrue{}%
+\iflecture{21}\lectureXXItrue{}%
+\iflecture{22}\lectureXXIItrue{}%
+\iflecture{23}\lectureXXIIItrue{}%
+\iflecture{24}\lectureXXIVtrue{}%
+\iflecture{25}\lectureXXVtrue{}%
+\iflecture{26}\lectureXXVItrue{}%
+\iflecture{27}\lectureXXVIItrue{}%
+\iflecture{28}\lectureXXVIIItrue{}%
+\iflecture{29}\lectureXXIXtrue{}%
+}
+\newcommand{\themylecture}{\@mylecture}
+
+
+
