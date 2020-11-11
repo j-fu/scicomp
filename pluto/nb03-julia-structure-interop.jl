@@ -1,42 +1,14 @@
 ### A Pluto.jl notebook ###
-# v0.12.3
+# v0.12.9
 
 using Markdown
 using InteractiveUtils
-
-# This Pluto notebook uses @bind for interactivity. When running this notebook outside of Pluto, the following 'mock version' of @bind gives bound variables a default value (instead of an error).
-macro bind(def, element)
-    quote
-        local el = $(esc(element))
-        global $(esc(def)) = Core.applicable(Base.get, el) ? Base.get(el) : missing
-        el
-    end
-end
-
-# ╔═╡ d312a490-0296-11eb-32c3-2f0866c93a1a
-push!(LOAD_PATH, pwd())
 
 # ╔═╡ baf88246-01d1-11eb-3d35-1393445b1476
 using Pkg; Pkg.activate(mktempdir()); Pkg.add("PlutoUI"); using PlutoUI
 
 # ╔═╡ 204dfcb6-029a-11eb-19b8-bd6beebf9291
 Pkg.add("PyCall"); using PyCall
-
-# ╔═╡ 6b8c3cfe-0297-11eb-15a6-b91ce15dbece
-begin
-	include("TestModule1.jl")
-    TestModule1.mtest(23)
-end
-
-# ╔═╡ 0434bba0-01d2-11eb-124f-ef216f314163
-md"""Hide package status: $(@bind hide_pkg_status CheckBox(false))"""
-
-# ╔═╡ fccd863a-01d1-11eb-126c-f5a20a339413
-if !hide_pkg_status 
-	with_terminal(Pkg.status)
-end
-
-
 
 # ╔═╡ d76c2038-0292-11eb-1fe0-e50fc2a4fc0f
 md"""
@@ -69,17 +41,18 @@ end
 ````
 to the startup file  `~/.julia/config/startup.jl` and to run Julia via `julia -i`.
 
+`Revise.jl` also keeps track of packages loaded. It also can be used with Pluto.
+
 ##### Modern workflow
 Use an IDE (integrated development environment). Currently the best one for Julia is Visual Studio Code with corresponding extensions.
 """
 
 # ╔═╡ 10121276-0293-11eb-082c-cda9b008c183
 md"""
-# Structuring your code: modules, files and packages
+# Structuring code: modules, files and packages
 
- - Complex code is split up into several files which can be included
+ - Complex code is split up into several files which can be included 
  - Need to avoid name clashes for code from different places
- - Organize the way to use third party code
 ### Modules
  Modules allow to encapsulate implementation into different namespaces
 """
@@ -92,54 +65,28 @@ module TestModule
   export mtest
 end
 
-# ╔═╡ cd77f9a0-0295-11eb-1494-6390a7c630d4
+# ╔═╡ 7e607edc-245a-11eb-108a-2bd010c087c6
 TestModule.mtest(3)
-
-# ╔═╡ 3d522e80-0296-11eb-33d7-63e1445b8d8b
-md"""
-`using TestModule` would allow to use exported functions without the need to qualify their name by prepending `TestModule`.
-"""
-
-# ╔═╡ c646ab26-0296-11eb-3699-f533655566bf
-md"""
-### ??? Finding modules
- - Put single file modules having the same name as the module
-   into a directory which in on the `LOAD_PATH`
- - Call "using" or "import" with the module
- - You can modify your `LOAD_PATH` by adding e.g. the actual directory
-
-Does not work from Pluto notebooks.
-"""
-
-# ╔═╡ e8672140-0296-11eb-08ab-e9b2833c82b7
-testmodule1_source="""
-module TestModule1
-   mtest(x)="testmodule1: x=\$(x)"
-   export mtest
-end
-"""
-
-# ╔═╡ 3e01bb60-0297-11eb-2c16-c9b4d5a8fd5b
-open("TestModule1.jl", "w") do io
-    write(io,testmodule1_source)
-end;
 
 # ╔═╡ 06a3282e-0298-11eb-39cc-a1e604624b9e
 md"""
-### ??? Packages
- - Packages are found via the same mechanism
- - Part of the load path are the  directory with downloaded packages
-   and the directory with packages under development
+### Packages
+ - Packages are modules searched for in a number of standard places
  - Each package is a directory named `Package` with a subdirectory `src`
  - The file `Package/src/Package.jl` defines a module named `Package`
  - More structures in a package:
     - Documentation build recipes
     - Test code
-    - Dependency description
-    - UUID (Universal unique identifier)
- - Default packages (e.g. the package manager Pkg) are always available
- - Use the package manager to checkout a new package via the registry
+    - Metadada: Dependency description, UUID (Universal unique identifier)...
+ - Default packages (e.g. the package manager Pkg) are always found in the `.julia` subdirectory of your home directory
+ - The package manager allows to add packages by finding them via the registry and downloading them.
 """
+
+# ╔═╡ a0e563b4-245a-11eb-22a0-3b7cc6e509d0
+readdir("/home/fuhrmann/.julia/packages/")
+
+# ╔═╡ eeeee3fa-245a-11eb-1343-09b5fe9ba7dd
+readdir("/home/fuhrmann/.julia/packages/AbstractTrees/")
 
 # ╔═╡ 227fba08-0298-11eb-22e7-2b9ebc0f57c8
 md"""
@@ -167,11 +114,11 @@ double cadd(double x, double y)
 # ╔═╡ 7f745912-0298-11eb-1cd0-9d6ad07ebd2d
 open("cadd.c", "w") do io
     write(io,cadd_source)
-end
+end;
 
 # ╔═╡ 7467dd68-0299-11eb-1c75-332ea70f8386
 md"""
-Compile using the gcc compiler:
+Compile to a shared object (aka "dll" on windows) using the gcc compiler:
 """
 
 # ╔═╡ 8efd157c-0298-11eb-340c-27c71e90bb80
@@ -197,7 +144,7 @@ cadd(1.5,2.4)
 
 # ╔═╡ fafc91f2-0299-11eb-3547-9bed631a26ad
 md"""
-- Julia uses this method to access a number of highly optimized linear algebra and other libraries
+- Julia and many of its packages use this method to access a number of highly optimized linear algebra and other libraries
 
 """
 
@@ -211,27 +158,32 @@ md"""
 The PyCall package provides the corresponding interface:
 """
 
+# ╔═╡ 7e3ccea0-245b-11eb-0a16-7181dc6865cf
+md"""
+Create a python source file:
+"""
+
 # ╔═╡ 36e3ccee-029a-11eb-205d-398851e27483
 pyadd_source="""
-def pyadd(x,y):
+def add(x,y):
     return x+y
 """
 
 # ╔═╡ 4d3cefa0-029a-11eb-3fdf-b98daa8a7e3d
 open("pyadd.py", "w") do io
     write(io,pyadd_source)
-end
+end;
 
 # ╔═╡ 6013f5d2-029a-11eb-3460-21e727082c09
 pyadd=pyimport("pyadd")
 
 # ╔═╡ 69572680-029a-11eb-31bf-cb2ffab1254d
-pyadd.pyadd(3.5,6.5)
+pyadd.add(3.5,6.6)
 
 # ╔═╡ 7b63d468-029a-11eb-1b57-75899ee7e700
 md"""
  - Julia allows to call almost any python package
- - E.g. matplotlib  graphics
+ - E.g. matplotlib  graphics - this is the python package behind PyPlot (there are more graphics options in Julia)
  - There is also a [pyjulia](https://github.com/JuliaPy/pyjulia) package
    allowing to call Julia from python
 
@@ -245,34 +197,29 @@ md"""
 """
 
 # ╔═╡ Cell order:
-# ╟─baf88246-01d1-11eb-3d35-1393445b1476
-# ╟─0434bba0-01d2-11eb-124f-ef216f314163
-# ╟─fccd863a-01d1-11eb-126c-f5a20a339413
-# ╠═d76c2038-0292-11eb-1fe0-e50fc2a4fc0f
-# ╠═10121276-0293-11eb-082c-cda9b008c183
+# ╠═baf88246-01d1-11eb-3d35-1393445b1476
+# ╟─d76c2038-0292-11eb-1fe0-e50fc2a4fc0f
+# ╟─10121276-0293-11eb-082c-cda9b008c183
 # ╠═8730ec36-0295-11eb-2174-0b010e72b224
-# ╠═cd77f9a0-0295-11eb-1494-6390a7c630d4
-# ╠═3d522e80-0296-11eb-33d7-63e1445b8d8b
-# ╠═c646ab26-0296-11eb-3699-f533655566bf
-# ╠═d312a490-0296-11eb-32c3-2f0866c93a1a
-# ╠═e8672140-0296-11eb-08ab-e9b2833c82b7
-# ╠═3e01bb60-0297-11eb-2c16-c9b4d5a8fd5b
-# ╠═6b8c3cfe-0297-11eb-15a6-b91ce15dbece
-# ╠═06a3282e-0298-11eb-39cc-a1e604624b9e
-# ╠═227fba08-0298-11eb-22e7-2b9ebc0f57c8
+# ╠═7e607edc-245a-11eb-108a-2bd010c087c6
+# ╟─06a3282e-0298-11eb-39cc-a1e604624b9e
+# ╠═a0e563b4-245a-11eb-22a0-3b7cc6e509d0
+# ╠═eeeee3fa-245a-11eb-1343-09b5fe9ba7dd
+# ╟─227fba08-0298-11eb-22e7-2b9ebc0f57c8
 # ╠═61177d0a-0298-11eb-0877-e1b1ac0ed644
 # ╠═7f745912-0298-11eb-1cd0-9d6ad07ebd2d
-# ╠═7467dd68-0299-11eb-1c75-332ea70f8386
+# ╟─7467dd68-0299-11eb-1c75-332ea70f8386
 # ╠═8efd157c-0298-11eb-340c-27c71e90bb80
-# ╠═ec15c2ba-0298-11eb-1e2c-05cd2baeedf8
+# ╟─ec15c2ba-0298-11eb-1e2c-05cd2baeedf8
 # ╠═a3edac0a-0299-11eb-1492-2d42211731e7
 # ╠═a29023ee-0299-11eb-36ce-5fd80778566a
-# ╠═fafc91f2-0299-11eb-3547-9bed631a26ad
-# ╠═e961fef8-0299-11eb-21a9-83346148ad85
+# ╟─fafc91f2-0299-11eb-3547-9bed631a26ad
+# ╟─e961fef8-0299-11eb-21a9-83346148ad85
 # ╠═204dfcb6-029a-11eb-19b8-bd6beebf9291
+# ╟─7e3ccea0-245b-11eb-0a16-7181dc6865cf
 # ╠═36e3ccee-029a-11eb-205d-398851e27483
 # ╠═4d3cefa0-029a-11eb-3fdf-b98daa8a7e3d
 # ╠═6013f5d2-029a-11eb-3460-21e727082c09
 # ╠═69572680-029a-11eb-31bf-cb2ffab1254d
-# ╠═7b63d468-029a-11eb-1b57-75899ee7e700
-# ╠═8db4d482-029a-11eb-2ec3-49e42af2d678
+# ╟─7b63d468-029a-11eb-1b57-75899ee7e700
+# ╟─8db4d482-029a-11eb-2ec3-49e42af2d678
