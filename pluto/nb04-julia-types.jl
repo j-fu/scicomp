@@ -55,10 +55,10 @@ typeof(false)
 typeof("false")
 
 # ╔═╡ c924835e-01d3-11eb-0fcb-0d7d4050b32c
-typeof([1,2,3])
+typeof(Float16[1,2,3])
 
 # ╔═╡ d2cca0be-01d3-11eb-017f-5f72d26f23ba
-typeof(rand(3,3))
+typeof(rand(Int,3,3))
 
 # ╔═╡ fb556f26-01d2-11eb-0244-d353d4ae0c9d
 md"""
@@ -105,7 +105,7 @@ struct TColor{T}
 end
 
 # ╔═╡ 4ef772e8-01d4-11eb-314a-ed0d1c24da77
-TColor{Float16}(0.5,0.5,0.1)
+TColor{UInt8}(4,25,233)
 
 # ╔═╡ c2be228a-01d4-11eb-243f-cf35c0ec0164
 md"""
@@ -123,7 +123,7 @@ md"""
 test_dispatch(x)="general case: $(typeof(x)), x=$(x)";
 
 # ╔═╡ 0468c2da-0955-11eb-271b-5d84d5d8343d
-test_dispatch(x::Float64)="special case Float64, x=$(x)";
+test_dispatch(x::AbstractFloat)="special case Float, $(typeof(x)), x=$(x)";
 
 # ╔═╡ 0cc7808a-0955-11eb-0b4d-ff491af88cf5
 test_dispatch(x::Int64)="special case Int64, x=$(x)";
@@ -132,7 +132,7 @@ test_dispatch(x::Int64)="special case Int64, x=$(x)";
 test_dispatch(3)
 
 # ╔═╡ 4c81312e-01d5-11eb-0fd8-3be89232486b
-test_dispatch(TColor{Float16}(0.5,0.5,0.1))
+test_dispatch(false)
 
 # ╔═╡ 625bfc6a-01d5-11eb-25cf-259a7943063d
 test_dispatch(3.0)
@@ -217,6 +217,9 @@ md"""
 # ╔═╡ 0ce950e0-01d9-11eb-0345-bd84b69b7e0a
 subtypes(Float64)
 
+# ╔═╡ c6834da2-2466-11eb-26a3-8b760d0bed2b
+supertype(Number)
+
 # ╔═╡ 49f559c2-01d9-11eb-3fb0-a9dc6c3ab515
 md"""
 - "Any" is the root of the type tree and has itself as supertype
@@ -242,7 +245,7 @@ There are operators for testing type relationships
 """
 
 # ╔═╡ 76efc16e-01da-11eb-3a78-bd1c99b5c79e
- Float64<: AbstractFloat
+ Float64<: Number
 
 # ╔═╡ 7d5c58e6-01da-11eb-1c79-a7b650bf3dc4
  Float64<: Integer
@@ -314,12 +317,13 @@ md"""
 # ╟─6d712526-01d5-11eb-3feb-e74c800fa893
 # ╠═ec9abf90-01d5-11eb-257b-f3a2f681c7b9
 # ╟─ec5288ec-01d5-11eb-2b09-a96fbe8fc00f
-# ╠═c7194b4a-01d7-11eb-0175-fda4e2b3947a
+# ╟─c7194b4a-01d7-11eb-0175-fda4e2b3947a
 # ╠═450a16a6-01d8-11eb-0d07-979219c7e493
 # ╟─d776bf38-01d8-11eb-2765-43dc1dbc3344
 # ╠═fd9463d4-01d8-11eb-0a87-f7924aa63bda
 # ╟─21d47428-01d9-11eb-1a5e-73de9310fc01
 # ╠═0ce950e0-01d9-11eb-0345-bd84b69b7e0a
+# ╠═c6834da2-2466-11eb-26a3-8b760d0bed2b
 # ╟─49f559c2-01d9-11eb-3fb0-a9dc6c3ab515
 # ╠═327f7c32-01d9-11eb-0d80-69042308ae71
 # ╟─910831ea-01d9-11eb-359d-996096e2641c

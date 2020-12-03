@@ -66,7 +66,7 @@ module TestModule
 end
 
 # ╔═╡ 7e607edc-245a-11eb-108a-2bd010c087c6
-TestModule.mtest(3)
+TestModule.mtest(2)
 
 # ╔═╡ 06a3282e-0298-11eb-39cc-a1e604624b9e
 md"""
@@ -75,7 +75,7 @@ md"""
  - Each package is a directory named `Package` with a subdirectory `src`
  - The file `Package/src/Package.jl` defines a module named `Package`
  - More structures in a package:
-    - Documentation build recipes
+    - Documentation resources
     - Test code
     - Metadada: Dependency description, UUID (Universal unique identifier)...
  - Default packages (e.g. the package manager Pkg) are always found in the `.julia` subdirectory of your home directory
@@ -86,7 +86,13 @@ md"""
 readdir("/home/fuhrmann/.julia/packages/")
 
 # ╔═╡ eeeee3fa-245a-11eb-1343-09b5fe9ba7dd
-readdir("/home/fuhrmann/.julia/packages/AbstractTrees/")
+readdir("/home/fuhrmann/.julia/packages/AbstractTrees/vOsoQ/")
+
+# ╔═╡ cc14ea20-245d-11eb-3b2d-d7d50cf98ad1
+md"""
+- After importing a package via the `import` statement, all functions from a package are available via their name prefixed with the name of the package.
+- The `using` statement makes these names available without prefix.
+"""
 
 # ╔═╡ 227fba08-0298-11eb-22e7-2b9ebc0f57c8
 md"""
@@ -140,7 +146,7 @@ md"""
 cadd(x,y)=ccall((:cadd, "libcadd"), Float64, (Float64,Float64,),x,y)
 
 # ╔═╡ a29023ee-0299-11eb-36ce-5fd80778566a
-cadd(1.5,2.4)
+cadd(1.5,2.5)
 
 # ╔═╡ fafc91f2-0299-11eb-3547-9bed631a26ad
 md"""
@@ -178,7 +184,7 @@ end;
 pyadd=pyimport("pyadd")
 
 # ╔═╡ 69572680-029a-11eb-31bf-cb2ffab1254d
-pyadd.add(3.5,6.6)
+pyadd.add(3.5,6.2)
 
 # ╔═╡ 7b63d468-029a-11eb-1b57-75899ee7e700
 md"""
@@ -205,6 +211,7 @@ md"""
 # ╟─06a3282e-0298-11eb-39cc-a1e604624b9e
 # ╠═a0e563b4-245a-11eb-22a0-3b7cc6e509d0
 # ╠═eeeee3fa-245a-11eb-1343-09b5fe9ba7dd
+# ╟─cc14ea20-245d-11eb-3b2d-d7d50cf98ad1
 # ╟─227fba08-0298-11eb-22e7-2b9ebc0f57c8
 # ╠═61177d0a-0298-11eb-0877-e1b1ac0ed644
 # ╠═7f745912-0298-11eb-1cd0-9d6ad07ebd2d

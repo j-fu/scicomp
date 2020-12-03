@@ -1,29 +1,21 @@
 ### A Pluto.jl notebook ###
-# v0.12.3
+# v0.12.11
 
 using Markdown
 using InteractiveUtils
 
-# This Pluto notebook uses @bind for interactivity. When running this notebook outside of Pluto, the following 'mock version' of @bind gives bound variables a default value (instead of an error).
-macro bind(def, element)
-    quote
-        local el = $(esc(element))
-        global $(esc(def)) = Core.applicable(Base.get, el) ? Base.get(el) : missing
-        el
-    end
-end
-
 # ╔═╡ 74e7b588-0753-11eb-10d5-f98133cdbd37
-using Pkg; Pkg.activate(mktempdir()); Pkg.add("PlutoUI"); using PlutoUI; md"""Hide package manager logs: $(@bind hide_status CheckBox(default=false))"""
+begin 
+	using Pkg
+	Pkg.activate(mktempdir()) 
+	Pkg.add("PyPlot") 
+	Pkg.add("BenchmarkTools")
+	Pkg.add("PlutoUI")
+	using PlutoUI,PyPlot,BenchmarkTools
+end
 
 # ╔═╡ 50551f36-0755-11eb-2ccd-111cbb151846
 using LinearAlgebra
-
-# ╔═╡ a2859d7a-0753-11eb-2899-f1c7694422fe
-hide_status ? nothing : with_terminal(Pkg.status)
-
-# ╔═╡ 8cfb9372-0753-11eb-320a-f3aa8e25a8dc
-Pkg.add("BenchmarkTools")
 
 # ╔═╡ a6634eec-0753-11eb-1e17-459995c901e5
 md"""
@@ -44,7 +36,7 @@ __Iterative methods__:
 
 # ╔═╡ 0debcc2e-0754-11eb-0d63-d97ee52fdbee
 md"""
-## Matrix and Vector norms
+## Matrix & vector norms
 
 #### Vector norms
 
@@ -123,7 +115,7 @@ opnorm(M,Inf),opnorm(M',1)
 
 # ╔═╡ f145b298-0757-11eb-2a39-81e3eae68732
 md"""
-## Matrix condition number and error propagation
+## Condition number and error propagation
 
 - Solve ``Ax=b``, where ``b`` is inexact
 - Let ``\Delta b`` be the error in ``b`` and ``\Delta x`` be    the resulting error in ``x`` such that
@@ -149,11 +141,12 @@ this estimates does not assume inexact arithmetics.
 
 # ╔═╡ e44842a6-075f-11eb-3bde-033a382534a0
 md"""
-Let us have an example. We use rational arithmetics in order to obtain exact values:
+Let us have an example. We use rational arithmetics in order to perform
+exact calulations.
 """
 
 # ╔═╡ 46bcf25e-080c-11eb-0318-1777997a27af
-T_test=Rational
+T_test=Float64
 
 # ╔═╡ c68c1eca-080b-11eb-2e0b-615717edcac8
 a=T_test(1_000_000)
@@ -251,7 +244,7 @@ Examples:
 
 # ╔═╡ 2b1a17e2-0812-11eb-0211-79e5ca3d815e
 md"""
-### A Direct method: Cramer's rule
+## A Direct method: Cramer's rule
 
 Solve $Ax=b$ by  Cramer's rule:
 
@@ -272,8 +265,9 @@ This takes     $O(N!)$ operations...
 
 # ╔═╡ 52d9bc72-0819-11eb-2fa2-691c3945def5
 md"""
-### Gaussian elimination and LU decomposition
+## LU decomposition
 
+#### Gaussian elimination 
 So let us have a look at Gaussian elimination to solve ``Ax=b``.
 The elementary matrix manipulation step in Gaussian elimination ist the multiplication of row k by ``-a_{jk}/a_{kk}`` and its addition to row j such that element
 ``_{jk}`` in the resulting matrix becomes zero. If this is done at once for all ``j>k``, we can express this operation as the left multiplication of ``A`` by a lower triangular Gauss transformation matrix ``M(A,k)``.  
@@ -303,10 +297,10 @@ Define a test matrix:
 """
 
 # ╔═╡ 9a7790de-0816-11eb-04e2-7de97dfbf14f
-A1=[2 1 3 4;
-    5 6 7 8;
-    7 6 8 5;
-	3 4 2 T_lu(2)]	
+A1=T_lu[2 1 3 4;
+        5 6 7 8;
+        7 6 8 5;
+        3 4 2 2;]	
 
 # ╔═╡ d54e9954-0a72-11eb-3734-9787b5ac704f
 md"""
@@ -357,11 +351,17 @@ U_3&=M(U_2,3)U_2=M(U_2,3)M(U_1,2)M(A,1)A
 Thus, ``A=LU`` with ``L=M(A,1)^{-1}M(U_1,2)^{-1}M(U_2,3)^{-1}`` and ``U=U_3``
 ``L`` is a lower triangular matrix and ``U`` is a upper triangular matrix.
 
+"""
+
+# ╔═╡ 0f320230-25f7-11eb-352e-a1581b339a05
+md"""
+#### A first LU decomposition
+
 We can put this together into a function:
 """
 
 # ╔═╡ 18bd1684-0818-11eb-3719-bbc66b19a46f
-function lu_decomposition(A)
+function my_first_lu_decomposition(A)
     n=size(A,1)
 	L=Matrix(one(eltype(A))I,n,n) # L=I
 	U=A
@@ -374,7 +374,7 @@ function lu_decomposition(A)
 end;
 
 # ╔═╡ 868140a0-0818-11eb-31f3-97ceaa9e3ee6
-Lx,Ux=lu_decomposition(A1)
+Lx,Ux=my_first_lu_decomposition(A1)
 
 # ╔═╡ 7f1e9ae6-081e-11eb-0a8c-37c2e5e4f46f
 md"""
@@ -387,7 +387,7 @@ Lx*Ux-A1
 # ╔═╡ b6d7052c-081e-11eb-0e73-dfbcb5ce9f2b
 md"""
 So now we can write  ``A=LU``. 
-Solving ``LUx=b`` then amounts to solve two tridiagonal systems:
+Solving ``LUx=b`` then amounts to solve two triangular systems:
 ```math
 \begin{align}
    Ly&=b\\
@@ -397,7 +397,7 @@ Solving ``LUx=b`` then amounts to solve two tridiagonal systems:
 """
 
 # ╔═╡ bc936a22-081f-11eb-31db-1de6f1dcd8cd
-function lu_solve(L,U,b)
+function my_first_lu_solve(L,U,b)
    y=inv(L)*b
    x=inv(U)*y
 end
@@ -406,7 +406,7 @@ end
 b1=[1,2,3,4]
 
 # ╔═╡ 0ba95716-0820-11eb-2a2e-85ba1889194c
-x1=lu_solve(Lx,Ux,b1)
+x1=my_first_lu_solve(Lx,Ux,b1)
 
 # ╔═╡ 2815bb92-0820-11eb-2070-0fbe9cc51801
 md"""
@@ -421,14 +421,19 @@ md"""
 ... in order to be didactical, in this example, we made a very inefficient implementation by creating matrices in each step. We even cheated by using `inv` in order to solve a triangular system.
 """
 
+# ╔═╡ 31e9913a-25f7-11eb-2123-9bbda1d00011
+md"""
+#### A reasonable implementation
+
+- Doolittles method  (Adapted from [__wikipedia: LU_decomposition__](https://en.wikipedia.org/wiki/LU_decomposition#MATLAB_code_examples))
+- This allows to perfrom LU decomposition in-place.
+"""
+
 # ╔═╡ 8a44392c-0822-11eb-1b27-63b7e8dad654
-function better_ludecomposition!(LU,A)
-	n = size(A,1)
+function better_lu_decomposition!(LU)
+	n = size(LU,1)
     # decomposition of matrix, Doolittle’s Method
-	if LU!=A
-		LU.=A
-	end
-    for i = 1:n
+	for i = 1:n
         for j = 1:(i - 1)
             alpha = LU[i,j];
             for k = 1:(j - 1)
@@ -448,14 +453,14 @@ function better_ludecomposition!(LU,A)
 end
 
 # ╔═╡ 86969070-0822-11eb-3413-0b4ea4c0fdb9
-function better_lusolve(LU,b)
+function better_lu_solve(LU,b)
     n = length(b);
     x = zeros(eltype(LU),n);
     y = zeros(eltype(LU),n);
     # LU= L+U-I
     # find solution of Ly = b
     for i = 1:n
-        alpha = 0;
+        alpha = zero(eltype(LU));
         for k = 1:i
             alpha = alpha + LU[i,k]*y[k];
         end
@@ -463,7 +468,7 @@ function better_lusolve(LU,b)
     end
     # find solution of Ux = y
     for i = n:-1:1
-        alpha = 0;
+        alpha = zero(eltype(LU));
         for k = (i + 1):n
             alpha = alpha + LU[i,k]*x[k];
         end
@@ -472,51 +477,28 @@ function better_lusolve(LU,b)
 	x
 end
 
-# ╔═╡ 8e2eed9c-0823-11eb-12cc-5158402bb8a1
-begin
-	global LU1=similar(A1)
-	better_ludecomposition!(LU1,A1)
-	LU1
-end
-
-# ╔═╡ 19042400-0824-11eb-12c2-6f3abcf33d35
-x2=better_lusolve(LU1,b1)
-
-# ╔═╡ 88aae398-0824-11eb-1f61-69ee34faf04b
-A1*x2-b1
+# ╔═╡ 39315d50-25f8-11eb-09ef-21ecbcd38917
+md"""
+We can then implement a method for linear system solution:
+"""
 
 # ╔═╡ f55f7f58-0824-11eb-0d3c-896973fee2d2
 function better_solve(A,b)
-	LU=similar(A)
-	better_ludecomposition!(LU,A)
-	better_lusolve(LU,b)
+	LU=copy(A)
+	better_lu_decomposition!(LU)
+	better_lu_solve(LU,b)
 end
 
 # ╔═╡ 280a2750-0825-11eb-15d9-1b698affa368
-x3=better_solve(A1,b1)
+x2=better_solve(A1,b1)
 
 # ╔═╡ bbb84ac6-0826-11eb-0e9b-6b1052b422a2
-x3-x2
-
-# ╔═╡ 2439605a-0825-11eb-27d8-4b6081a391ef
-function better_solve!(A,b)
-	better_ludecomposition!(A,A)
-	better_lusolve(A,b)
-end
-
-# ╔═╡ 852716f8-0825-11eb-125e-09c8f9ccd219
-A2=copy(A1)
-
-# ╔═╡ 8bb67cae-0825-11eb-38f4-25091d37bfa5
-x4=better_solve!(A2,b1)
-
-# ╔═╡ c53282f6-0826-11eb-2a46-a9ed5d4c95ab
-x4-x3
+A1*x2-b1
 
 # ╔═╡ 5564a86e-0821-11eb-08e9-511392c0f92f
 md"""
-#### Pivoting
-So far, we ignored the possibility that a diagonal element becomes zero.
+### Pivoting
+So far, we ignored the possibility that a diagonal element becomes zero during the LU factorization procedure.
 
 Pivoting tries to remedy the problem that  during the algorithm, diagonal elements can become zero. Before undertaking the next Gauss transformation step, we can exchange rows such that we always dividy by the largest of the remaining diagonal elements.
 This would then in fact result in a decompositon
@@ -531,85 +513,160 @@ PAQ=LU
 Almost all practically used LU decomposition implementations use partial pivoting.
 """
 
-# ╔═╡ 0da631a4-0827-11eb-3dcd-fb59e166c995
+# ╔═╡ 50848d6a-25f6-11eb-1c81-ffc90ecd594d
 md"""
+### LU Factorization from Julia library
+
 Julia implements a pivoting LU factorization
 """
 
 # ╔═╡ e9bf45f0-0826-11eb-034b-e99fcd8145f4
 lu1=lu(A1)
 
+# ╔═╡ 947f3b5e-25f9-11eb-129a-2fe1360fdb80
+md"""
+Like in matlab, the backslash opertor "solves", in this case it solves the LU factorization:
+"""
+
 # ╔═╡ faaa0d64-0826-11eb-347c-adc171c57373
 lu1\b1
 
-# ╔═╡ 4cad3a1e-0827-11eb-3a02-8d91f4c3c96a
-A3=copy(A1)
-
-# ╔═╡ 5199eb9e-0827-11eb-2089-c592541190a2
-lu3=lu!(A3)
-
-# ╔═╡ 727e6dbc-0827-11eb-3109-c91315e552f3
-lu3\b1
-
-# ╔═╡ 1b0d9364-0827-11eb-1d28-1f1d5122410e
-lu([0 T_lu(1); 
-  2 0])
-
-# ╔═╡ 9b882b1c-0827-11eb-2dad-05b7d27a95c6
+# ╔═╡ b13c4c3a-25f9-11eb-1605-2922324b22f6
 md"""
-# TODO
-- lu vs inv, Julia lu, lapack
-- complexity
-- what type of matrices is interesting ? differential operators (1/2/3D)
-- progonka
-- sparse
-- homework: beat Julia: implement progonka
+Of course we can apply `\` directly to a matrix. However, behind this always LU decomposition and LU solve are called:
 """
 
+# ╔═╡ 786ac1e2-25f9-11eb-0854-dfdcc125e983
+x3=A1\b1
+
+# ╔═╡ 81e17fdc-2605-11eb-1ff6-69c74cfd0dd7
+A1*x3-b1
+
+# ╔═╡ e7665992-25f9-11eb-3489-8747d8eacbc7
+md"""
+### LU vs. inv
+"""
+
+# ╔═╡ ff05d0a0-25f9-11eb-0d67-7f43e85911d6
+md"""
+In principle we could work with the inverse matrix as well:
+"""
+
+# ╔═╡ 15fe46a2-25fa-11eb-2c6a-fba4ff2adf8c
+A1inv=inv(A1)
+
+# ╔═╡ 1f7720c8-25fa-11eb-3e90-f3915c48a581
+A1inv*b1
+
+# ╔═╡ 2aa00faa-25fa-11eb-1b52-a74f2aff0086
+md"""
+However, inversion is more complex than the LU factorization.
+"""
+
+# ╔═╡ 41946c7e-25fa-11eb-17af-05777b324a3c
+md"""
+### Some performance tests. 
+
+We generate matrices 
+"""
+
+# ╔═╡ 4232def2-2601-11eb-2cc5-efacaf81d629
+rand_Ab(n)=(100.0I(n)+rand(n,n),rand(n))
+
+# ╔═╡ 4a7610ee-25fb-11eb-1545-0b2b269a0517
+function perftest_lu(n)
+	A,b=rand_Ab(n)
+	@elapsed A\b
+end;
+
+# ╔═╡ bea46200-25fa-11eb-0df1-432f43349282
+function perftest_inv(n)
+    A,b=rand_Ab(n)
+    @elapsed inv(A)*b
+end
+
+# ╔═╡ 82592a36-2601-11eb-309c-85932f75c65f
+function perftest_better(n)
+    A,b=rand_Ab(n)
+    @elapsed better_solve(A,b)
+end
+
+# ╔═╡ 3eb02a88-25fb-11eb-278a-8be715c65c09
+function test_and_plot(pmax)
+	N= 2 .^collect(5:pmax)
+	t_inv=perftest_inv.(N)
+	t_lu=perftest_lu.(N)
+
+	clf()
+    loglog(N,t_inv,"-o",label="inv(A)*b")
+	loglog(N,t_lu,"-o",label="A\\b")
+	loglog(N,1.0e-9*N.^2.75,"k--",label="O(\$N^{2.75}\$)")
+	if pmax<12
+  	  t_b=perftest_better.(N)
+	   loglog(N,t_b,"-o",label="\"better\"")
+	   loglog(N,1.0e-9*N.^3,"k-",label="O(\$N^{3}\$)")
+	end
+	xlabel("Number of unknowns N")
+	ylabel("Execution time t/s")
+	title("Experimental complexity of dense linear system solution")
+	grid()
+	legend(loc="upper left")
+	gcf()
+end
+
+# ╔═╡ d405f360-25fb-11eb-229a-211688d7fa90
+test_and_plot(11)
+
+# ╔═╡ ef68a4ca-25fd-11eb-190c-438fdd08a008
+md"""
+- The overall complexity in this experiment is around ``O(N^{2.75})`` which is in the region of some theoretical estimates.
+- A good implementation is hard to get right, straightforward code performs worse than the system implementation
+- Using inversion instead of `\` is significantly slower (log scale in the plot!)
+- For standard floating point types, Julia uses  highly optimized versions of [LINPACK](http://www.netlib.org/linpack/) and [BLAS](http://www.netlib.org/blas)
+  - Same for python/numpy and many other coding environments
+"""
 
 # ╔═╡ Cell order:
-# ╟─74e7b588-0753-11eb-10d5-f98133cdbd37
-# ╟─a2859d7a-0753-11eb-2899-f1c7694422fe
-# ╠═8cfb9372-0753-11eb-320a-f3aa8e25a8dc
+# ╠═74e7b588-0753-11eb-10d5-f98133cdbd37
 # ╠═50551f36-0755-11eb-2ccd-111cbb151846
-# ╠═a6634eec-0753-11eb-1e17-459995c901e5
+# ╟─a6634eec-0753-11eb-1e17-459995c901e5
 # ╟─0debcc2e-0754-11eb-0d63-d97ee52fdbee
-# ╠═d80a35a4-0754-11eb-3db4-a55fcc791545
+# ╟─d80a35a4-0754-11eb-3db4-a55fcc791545
 # ╟─df02ce48-0754-11eb-3da1-9bed1696db10
 # ╠═4290591c-0755-11eb-1fdf-a9bc1f928988
 # ╟─716b78a0-0755-11eb-315a-cbbd504cc47f
 # ╠═8d652e18-0755-11eb-08dc-9572175e54aa
 # ╟─a4db244e-0755-11eb-1c84-4fe111f9ad64
 # ╠═ba2c3360-0755-11eb-262e-3f088275edce
-# ╠═fa66b45a-0755-11eb-1cf8-8509ef135247
+# ╟─fa66b45a-0755-11eb-1cf8-8509ef135247
 # ╠═aa3cc202-0756-11eb-185b-2193e91fedf9
 # ╟─c95cbaa2-0756-11eb-1bc3-39e8978628f2
 # ╠═d3de46e4-0756-11eb-0afb-a12993be472f
-# ╟─e5de80c0-0756-11eb-13bb-c5277a8657d9
+# ╠═e5de80c0-0756-11eb-13bb-c5277a8657d9
 # ╠═f4b01c12-0756-11eb-1bbb-cd985eceb276
-# ╟─43333c52-0757-11eb-0bd4-8d55d373663f
+# ╠═43333c52-0757-11eb-0bd4-8d55d373663f
 # ╠═5386385c-0757-11eb-146f-2ba456f3b141
-# ╟─f145b298-0757-11eb-2a39-81e3eae68732
-# ╟─e44842a6-075f-11eb-3bde-033a382534a0
+# ╠═f145b298-0757-11eb-2a39-81e3eae68732
+# ╠═e44842a6-075f-11eb-3bde-033a382534a0
 # ╠═46bcf25e-080c-11eb-0318-1777997a27af
 # ╠═c68c1eca-080b-11eb-2e0b-615717edcac8
 # ╠═e8c1995c-080b-11eb-0e1b-57ed72f8a132
 # ╠═661e1b68-0759-11eb-291d-2784e3eb53ba
 # ╠═89b9dccc-075b-11eb-272d-832ad3585a49
 # ╠═b5bd7948-0759-11eb-2253-3d328838aa0f
-# ╟─7b9c1ec0-0760-11eb-292f-53c107cedfaf
+# ╠═7b9c1ec0-0760-11eb-292f-53c107cedfaf
 # ╠═98cfb558-0759-11eb-179b-eb79724273cd
-# ╟─8940bb94-0760-11eb-1ca3-43edfc5ce911
+# ╠═8940bb94-0760-11eb-1ca3-43edfc5ce911
 # ╠═94684000-080f-11eb-10e8-9598b369602b
-# ╟─c0ad6866-0760-11eb-3944-d1b49a337a6b
+# ╠═c0ad6866-0760-11eb-3944-d1b49a337a6b
 # ╠═df573300-0759-11eb-0679-a520f177ead5
-# ╟─db09b0c0-0760-11eb-0793-c1cda30e7c23
+# ╠═db09b0c0-0760-11eb-0793-c1cda30e7c23
 # ╠═f4173742-0759-11eb-35f9-ada91a23883c
-# ╟─2de0e4a8-0761-11eb-013e-212932e723e6
+# ╠═2de0e4a8-0761-11eb-013e-212932e723e6
 # ╠═57576354-075a-11eb-1d73-2d6a9412aba7
-# ╟─3d6394aa-0761-11eb-1d86-4d2dc4a0419c
+# ╠═3d6394aa-0761-11eb-1d86-4d2dc4a0419c
 # ╠═1241e4ba-075a-11eb-38df-1bb1b74ed44e
-# ╟─4432f8a4-0761-11eb-2831-91c0e848c67d
+# ╠═4432f8a4-0761-11eb-2831-91c0e848c67d
 # ╠═628aeb1a-075a-11eb-01d8-8de2ca6c2405
 # ╠═1550be6a-0811-11eb-2e70-f1c5fe9285f6
 # ╠═2b1a17e2-0812-11eb-0211-79e5ca3d815e
@@ -628,6 +685,7 @@ md"""
 # ╠═fea411aa-0a72-11eb-3a89-e9103ecf4cf1
 # ╠═f3325530-081e-11eb-158d-97fe2978c5e3
 # ╠═ac4403f4-081b-11eb-3be0-8326129a74e9
+# ╠═0f320230-25f7-11eb-352e-a1581b339a05
 # ╠═18bd1684-0818-11eb-3719-bbc66b19a46f
 # ╠═868140a0-0818-11eb-31f3-97ceaa9e3ee6
 # ╠═7f1e9ae6-081e-11eb-0a8c-37c2e5e4f46f
@@ -639,24 +697,31 @@ md"""
 # ╠═2815bb92-0820-11eb-2070-0fbe9cc51801
 # ╠═1f08663a-0820-11eb-00d2-6f1abf7a9fe4
 # ╠═ecf0d32a-0820-11eb-19c8-c7b25c9f88a0
+# ╠═31e9913a-25f7-11eb-2123-9bbda1d00011
 # ╠═8a44392c-0822-11eb-1b27-63b7e8dad654
 # ╠═86969070-0822-11eb-3413-0b4ea4c0fdb9
-# ╠═8e2eed9c-0823-11eb-12cc-5158402bb8a1
-# ╠═19042400-0824-11eb-12c2-6f3abcf33d35
-# ╠═88aae398-0824-11eb-1f61-69ee34faf04b
+# ╠═39315d50-25f8-11eb-09ef-21ecbcd38917
 # ╠═f55f7f58-0824-11eb-0d3c-896973fee2d2
 # ╠═280a2750-0825-11eb-15d9-1b698affa368
 # ╠═bbb84ac6-0826-11eb-0e9b-6b1052b422a2
-# ╠═2439605a-0825-11eb-27d8-4b6081a391ef
-# ╠═852716f8-0825-11eb-125e-09c8f9ccd219
-# ╠═8bb67cae-0825-11eb-38f4-25091d37bfa5
-# ╠═c53282f6-0826-11eb-2a46-a9ed5d4c95ab
 # ╠═5564a86e-0821-11eb-08e9-511392c0f92f
-# ╠═0da631a4-0827-11eb-3dcd-fb59e166c995
+# ╠═50848d6a-25f6-11eb-1c81-ffc90ecd594d
 # ╠═e9bf45f0-0826-11eb-034b-e99fcd8145f4
+# ╠═947f3b5e-25f9-11eb-129a-2fe1360fdb80
 # ╠═faaa0d64-0826-11eb-347c-adc171c57373
-# ╠═4cad3a1e-0827-11eb-3a02-8d91f4c3c96a
-# ╠═5199eb9e-0827-11eb-2089-c592541190a2
-# ╠═727e6dbc-0827-11eb-3109-c91315e552f3
-# ╠═1b0d9364-0827-11eb-1d28-1f1d5122410e
-# ╠═9b882b1c-0827-11eb-2dad-05b7d27a95c6
+# ╠═b13c4c3a-25f9-11eb-1605-2922324b22f6
+# ╠═786ac1e2-25f9-11eb-0854-dfdcc125e983
+# ╠═81e17fdc-2605-11eb-1ff6-69c74cfd0dd7
+# ╠═e7665992-25f9-11eb-3489-8747d8eacbc7
+# ╠═ff05d0a0-25f9-11eb-0d67-7f43e85911d6
+# ╠═15fe46a2-25fa-11eb-2c6a-fba4ff2adf8c
+# ╠═1f7720c8-25fa-11eb-3e90-f3915c48a581
+# ╠═2aa00faa-25fa-11eb-1b52-a74f2aff0086
+# ╠═41946c7e-25fa-11eb-17af-05777b324a3c
+# ╠═4232def2-2601-11eb-2cc5-efacaf81d629
+# ╠═4a7610ee-25fb-11eb-1545-0b2b269a0517
+# ╠═bea46200-25fa-11eb-0df1-432f43349282
+# ╠═82592a36-2601-11eb-309c-85932f75c65f
+# ╠═3eb02a88-25fb-11eb-278a-8be715c65c09
+# ╠═d405f360-25fb-11eb-229a-211688d7fa90
+# ╟─ef68a4ca-25fd-11eb-190c-438fdd08a008
